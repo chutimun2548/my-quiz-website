@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise for My Junior</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #fff3e6; /* สีครีมอ่อน */
+            text-align: center;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .hidden {
+            display: none;
+        }
+        img {
+            max-width: 120px; /* ขนาดภาพเล็กลง */
+            height: auto;
+        }
+        .button {
+            background-color: #ffcc00; /* สีเหลือง */
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #ffdb4d; /* สีเหลืองอ่อน */
+        }
+        .options {
+            margin: 10px 0;
+        }
+        .option {
+            background-color: #ffe6cc; /* สีครีม */
+            border: 1px solid #ffcc99;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+        .option:hover {
+            background-color: #ffd9b3; /* สีครีมอ่อน */
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="start-screen">
+        <h1>ยินดีต้อนรับ!</h1>
+        <p>ตอบคำถาม 5 ข้อให้ถูกต้องเพื่อเข้าสู่เซอร์ไพรส์!</p>
+        <button class="button" onclick="startQuiz()">เริ่มเกม</button>
+    </div>
+
+    <div class="container hidden" id="quiz-screen">
+        <h2 id="question"></h2>
+        <div id="options" class="options"></div>
+        <p id="feedback"></p>
+    </div>
+
+    <div class="container hidden" id="result-screen">
+        <h2 id="result-message"></h2>
+        <img id="result-image" src="" alt="">
+    </div>
+
+    <audio id="bg-music" loop>
+        <source src="bannayathat.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="success-music">
+        <source src="graduation-song.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="laugh-sound">
+        <source src="laugh.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="cheer-sound">
+        <source src="cheer.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const questions = [
+            { q: "น้องกับพี่รู้จักกันตอนไหน", a: "ตอนพี่ชวนเล่นเกม", wrong: ["ตอนที่พี่เดินผ่าน", "น้องไม่รู้", "ตอนพี่กินข้าว"] },
+            { q: "น้องอันตรากับพี่เล่นเกมอะไรด้วยกันเป็นครั้งแรก", a: "ROV", wrong: ["PUBG", "LOL", "Free Fire"] },
+            { q: "ตอนพี่เจอเราครั้งแรกตอนไหน", a: "ตอน ม.ต้น", wrong: ["ตอน ม.ปลาย", "ตอนอนุบาล", "ตอน ม.3"] },
+            { q: "พี่ชอบอนิเมะเรื่องอะไร", a: "jujutsu kaisen", wrong: ["Attack on Titan", "Naruto", "One Piece"] },
+            { q: "ตอนพี่พึ่งรู้จักน้องอันตรา ตอนนั้นน้องคอสเป็นตัวอะไรลงหน้าเฟส", a: "KOBENI", wrong: ["Sakura", "Naruto", "Luffy"] }
+        ];
+        
+        let currentQuestion = 0;
+        let correctAnswers = 0;
+
+        function startQuiz() {
+            document.getElementById("start-screen").classList.add("hidden");
+            document.getElementById("quiz-screen").classList.remove("hidden");
+            document.getElementById("bg-music").play();
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestion < questions.length) {
+                document.getElementById("question").innerText = questions[currentQuestion].q;
+                const optionsDiv = document.getElementById("options");
+                optionsDiv.innerHTML = ''; // Clear previous options
+                const correctOption = document.createElement('div');
+                correctOption.classList.add('option');
+                correctOption.innerText = questions[currentQuestion].a;
+                correctOption.onclick = () => checkAnswer(true);
+                optionsDiv.appendChild(correctOption);
+                
+                questions[currentQuestion].wrong.forEach(wrongAnswer => {
+                    const wrongOption = document.createElement('div');
+                    wrongOption.classList.add('option');
+                    wrongOption.innerText = wrongAnswer;
+                    wrongOption.onclick = () => checkAnswer(false);
+                    optionsDiv.appendChild(wrongOption);
+                });
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function checkAnswer(isCorrect) {
+            if (isCorrect) {
+                correctAnswers++;
+                document.getElementById("feedback").innerText = "ถูกต้อง!";
+            } else {
+                document.getElementById("feedback").innerText = "ผิด!";
+                document.getElementById("laugh-sound").play();
+                finishQuiz();
+                return;
+            }
+            currentQuestion++;
+            showQuestion();
+        }
+
+        function finishQuiz() {
+            document.getElementById("quiz-screen").classList.add("hidden");
+            document.getElementById("result-screen").classList.remove("hidden");
+            document.getElementById("bg-music").pause();
+            if (correctAnswers === questions.length) {
+                document.getElementById("result-message").innerText = "ดีใจด้วยที่เรียนจนจบมาได้ และก็พี่รอเรามาต่อที่ มมส. นะ ตอนแรกที่พี่ไม่อยากให้เราต่อ มมส. เพราะว่า เราน่าจะก้าวหน้ามากกว่านี้ ไม่ใช่ว่า มมส. ไม่ดีนะ แต่พี่คิดว่าเราน่าจะไปต่อได้มากกว่านี้ แต่ทุกอย่างก็ไม่เป็นแบบที่เราหวังหรือคิดเท่าไหร่ อาจจะมีผิดหวังบ้างเสียใจบ้าง พี่ก็เป็นกำลังใจให้เราผ่านไปให้ได้นะ และก็แคปหน้านี้มาเพื่อมาทำรางวัลกับพี่นะจ้ะ อิอิ";
+                document.getElementById("result-image").src = "https://scontent.fkkc2-1.fna.fbcdn.net/v/t39.30808-6/473817457_1251359305924584_2756421936055395592_n.jpg";
+                document.getElementById("cheer-sound").play();
+            } else {
+                document.getElementById("result-message").innerText = "น้องทำให้พี่เสียใจมากที่จำไม่ได้ 😢";
+                document.getElementById("result-image").src = "demon-emoji.png";
+            }
+        }
+    </script>
+</body>
+</html>
